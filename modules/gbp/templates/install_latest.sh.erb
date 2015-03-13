@@ -1,0 +1,20 @@
+#!/bin/bash
+# Grab the latest agent RPMs and install on the system.  Must run as root
+
+set -e
+set -u
+
+project=${1:-Opflex}
+dir=`mktemp -d`
+
+function cleanup {
+  echo "Removing $dir"
+  rm -rf "$dir"
+}
+
+trap cleanup EXIT
+
+unset http_proxy
+curl -o "$dir/archive.zip" "http://172.28.184.9/job/${project}_RPM/lastSuccessfulBuild/artifact/*zip*/archive.zip"
+unzip -d "$dir" "$dir/archive.zip"
+rpm --force -Uvh `find "$dir/archive" -name '*.x86_64.rpm'`
