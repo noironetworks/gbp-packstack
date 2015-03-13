@@ -1,5 +1,4 @@
 # gbp-packstack
-gbp packstack 
 This is a patch to packstack to support configuration of GBP, till it becomes part of packstack.
 
 Installation
