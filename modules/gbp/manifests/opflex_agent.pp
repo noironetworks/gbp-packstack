@@ -2,7 +2,7 @@ class gbp::opflex_agent(
   $opflex_log_level = 'debug5',
   $opflex_peer_ip = '10.0.0.30',
   $opflex_peer_port = '8009',
-  $opflex_ssl_mode = 'disabled',
+  $opflex_ssl_mode = 'enabled',
   $opflex_endpoint_dir = '/var/lib/opflex-agent-ovs/endpoints',
   $opflex_ovs_bridge_name = 'br-int',
   $opflex_encap_iface = 'br-int_vxlan0',
