@@ -95,7 +95,7 @@ class gbp::opflex_agent(
    }
 
    exec {'replace_ovs_binary':
-      command => "/usr/bin/sed -i -- 's/neutron-openvswitch-agent/openstack-oflex-agent/g' /usr/lib/systemd/system/neutron-openvswitch-agent.service; /usr/bin/systemctl daemon-reload",
+      command => "/usr/bin/sed -i -- 's/neutron-openvswitch-agent/openstack-opflex-agent/g' /usr/lib/systemd/system/neutron-openvswitch-agent.service; /usr/bin/systemctl daemon-reload",
       onlyif => "/bin/grep neutron-openvswitch-agent /usr/lib//systemd/system/neutron-openvswitch-agent.service | /usr/bin/wc -l",
       notify => Service['neutron-openvswitch-agent']
    }
