@@ -61,7 +61,7 @@ class gbp() {
    }
  
    exec {'get_python_opflex_agent':
-      command => "/usr/bin/git clone https://github.com/noironetworks/python-opflex-agent.git -b master $pyopflexagent", 
+      command => "/usr/bin/git clone https://github.com/noironetworks/python-opflex-agent.git -b noiro $pyopflexagent", 
       creates => $pyopflexagent,
       require => Exec['create_src_dir'],
    }
