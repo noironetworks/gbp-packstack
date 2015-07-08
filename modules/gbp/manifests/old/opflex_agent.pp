@@ -1,12 +1,12 @@
 class gbp::opflex_agent(
-  $opflex_log_level = 'debug5',
+  $opflex_log_level = 'debug2',
   $opflex_peer_ip = '10.0.0.30',
   $opflex_peer_port = '8009',
-  $opflex_ssl_mode = 'disabled',
+  $opflex_ssl_mode = 'enabled',
   $opflex_endpoint_dir = '/var/lib/opflex-agent-ovs/endpoints',
   $opflex_ovs_bridge_name = 'br-int',
   $opflex_encap_iface = 'br-int_vxlan0',
-  $opflex_uplink_iface = 'eth1.4093',
+  $opflex_uplink_iface = 'opflex1.4093',
   $opflex_uplink_vlan = '4093',
   $opflex_remote_ip = '10.0.0.32',
   $opflex_remote_port = '8472',
@@ -95,7 +95,7 @@ class gbp::opflex_agent(
    }
 
    exec {'replace_ovs_binary':
-      command => "/usr/bin/sed -i -- 's/neutron-openvswitch-agent/opflex-ovs-agent/g' /usr/lib/systemd/system/neutron-openvswitch-agent.service; /usr/bin/systemctl daemon-reload",
+      command => "/usr/bin/sed -i -- 's/neutron-openvswitch-agent/openstack-opflex-agent/g' /usr/lib/systemd/system/neutron-openvswitch-agent.service; /usr/bin/systemctl daemon-reload",
       onlyif => "/bin/grep neutron-openvswitch-agent /usr/lib//systemd/system/neutron-openvswitch-agent.service | /usr/bin/wc -l",
       notify => Service['neutron-openvswitch-agent']
    }
@@ -112,7 +112,7 @@ class gbp::opflex_agent(
    }
 
    exec {'offload':
-      command => "/usr/sbin/ethtool --offload eth1.4093 tx off",
+      command => "/usr/sbin/ethtool --offload opflex1.4093 tx off",
    }
 
    #exec {'del-old-br':

@@ -1,6 +1,4 @@
-class gbp::gbp_network_controller() {
-
-   class {'gbp::gbp_neutron_conf':}
+class gbp::gbp_neutron_dhcp() {
 
    Neutron_dhcp_agent_config<||> ~> Service['neutron-dhcp-agent']
 

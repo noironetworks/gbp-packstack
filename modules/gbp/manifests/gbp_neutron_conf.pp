@@ -1,6 +1,7 @@
 class gbp::gbp_neutron_conf() {
 
    neutron_config {
+     'DEFAULT/default_log_levels': value => "neutron.context=ERROR";
      'DEFAULT/apic_system_id': value => "openstack";
      'DEFAULT/service_plugins': value => 'group_policy,servicechain,router,lbaas';
      'opflex/networks': value => '*';
@@ -18,9 +19,9 @@ class gbp::gbp_neutron_conf() {
      'ml2_cisco_apic/apic_name_mapping': value => "use_name";
      'group_policy/policy_drivers': value => 'implicit_policy,apic';
      'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
-     'servicechain/servicechain_drivers': value => "chain_with_two_arm_appliance_driver";
      'appliance_driver/svc_management_ptg_name': value => "Service-Management";
    }
+     #'servicechain/servicechain_drivers': value => "chain_with_two_arm_appliance_driver";
 
    $swarr = parsejson(hiera('CONFIG_APIC_CONN_JSON'))
 

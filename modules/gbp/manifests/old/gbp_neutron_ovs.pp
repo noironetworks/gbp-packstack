@@ -1,4 +1,4 @@
-class gbp::gbp_neutron_plugin_ovs() {
+class gbp::gbp_neutron_ovs() {
 
    neutron_plugin_ovs {
      'ovs/enable_tunneling': value => false;
@@ -29,14 +29,4 @@ class gbp::gbp_neutron_plugin_ovs() {
       path => '/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini',
       setting => 'tunnel_types',
    }
-   exec {'change_nova_shell':
-      command => "/usr/sbin/usermod -s /bin/bash nova",
-      notify => Service['openstack-nova-compute'],
-   }
-
-   service {'openstack-nova-compute':
-      ensure => running,
-      enable => true,
-   }
-
 }

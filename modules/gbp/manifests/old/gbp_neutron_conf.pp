@@ -1,15 +1,7 @@
 class gbp::gbp_neutron_conf() {
 
-#   Neutron_config<||> ~> Service['neutron-server']
-#
-#   if !defined(Service['neutron-server']) {
-#      service {'neutron-server':
-#         ensure => running,
-#         enable => true,
-#      }
-#   }
-
    neutron_config {
+     'DEFAULT/default_log_levels': value => "neutron.context=ERROR";
      'DEFAULT/apic_system_id': value => "openstack";
      'DEFAULT/service_plugins': value => 'group_policy,servicechain,router,lbaas';
      'opflex/networks': value => '*';
