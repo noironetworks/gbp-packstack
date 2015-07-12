@@ -91,16 +91,16 @@ def initConfig(controller):
          "USE_DEFAULT": True,
          "CONDITION": False},
 
-        {"CMD_OPTION": "gbp-use-opflex",
-         "USAGE": "Use opflex agent on compute hosts",
-         "PROMPT": "Use opflex agent on compute hosts?",
-         "OPTION_LIST": ["y", "n"],
+        {"CMD_OPTION": "gbp-mode",
+         "USAGE": "GBP mode",
+         "PROMPT": "GBP mode, valid values (ml2-apicl3-noopflex, ml2-neutronl3-noopflex, ml2-opflex, opflex)?",
+         "OPTION_LIST": ["ml2-apicl3-noopflex", "ml2-neutronl3-noopflex", "ml2-opflex", "opflex"],
          "VALIDATORS": [validators.validate_options],
          "PROCESSORS": [],
-         "DEFAULT_VALUE": "y",
+         "DEFAULT_VALUE": "opflex",
          "MASK_INPUT": False,
          "LOOSE_VALIDATION": False,
-         "CONF_NAME": "CONFIG_GBP_USE_OPFLEX",
+         "CONF_NAME": "CONFIG_GBP_MODE",
          "USE_DEFAULT": True,
          "NEED_CONFIRM": False,
          "CONDITION": False},
@@ -164,16 +164,30 @@ def initSequences(controller):
     compute_hosts = split_hosts(config['CONFIG_COMPUTE_HOSTS'])
     q_hosts = api_hosts | network_hosts | compute_hosts
 
-    gbpsteps = [
-        {'title': 'Adding GBP packages installation manifest entries',
-         'functions': [create_gbp_pkgs_install_manifests]},
-        {'title': 'Adding GBP neutron configuration manifest entries',
-         'functions': [create_gbp_neutron_config_manifests]},
-        {'title': 'Adding GBP nova configuration manifest entries',
-         'functions': [create_gbp_nova_config_manifests]},
-        {'title': 'Adding GBP UI configuration manifest entries',
-         'functions': [create_gbp_ui_manifests]},
-    ]
+    gbpsteps = [ ]
+    if config['CONFIG_GBP_MODE'] == "opflex":
+        gbpsteps = [
+            {'title': 'Adding GBP packages installation manifest entries',
+             'functions': [opflex_create_gbp_pkgs_install_manifests]},
+            {'title': 'Adding GBP neutron configuration manifest entries',
+             'functions': [opflex_create_gbp_neutron_config_manifests]},
+            {'title': 'Adding GBP nova configuration manifest entries',
+             'functions': [create_gbp_nova_config_manifests]},
+            {'title': 'Adding GBP UI configuration manifest entries',
+             'functions': [create_gbp_ui_manifests]},
+        ]
+
+    if config['CONFIG_GBP_MODE'] == "ml2-neutronl3-noopflex":
+        gbpsteps = [
+            {'title': 'ML2-NL3-NOOPFLEX, Adding GBP packages installation manifest entries',
+                'functions': [ml2_nl3_noopflex_create_gbp_pkgs_install_manifests]},   
+            {'title': 'ML2-NL3-NOOPFLEX, Adding GBP neutron configuration manifest entries',
+                'functions': [ml2_nl3_noopflex_create_gbp_neutron_config_manifests]},
+            {'title': 'ML2-NL3-NOOPFLEX Adding GBP nova configuration manifest entries',
+             'functions': [ml2_nl3_noopflex_create_gbp_nova_config_manifests]},
+            {'title': 'ML2-NL3-NOOPFLEX Adding GBP UI configuration manifest entries',
+             'functions': [ml2_nl3_noopflex_create_gbp_ui_manifests]},
+        ]
     controller.addSequence("Installing OpenStack GBP", [], [], gbpsteps)
 
 
@@ -182,7 +196,54 @@ def initSequences(controller):
 
 # -------------------------- step functions --------------------------
 
-def create_gbp_pkgs_install_manifests(config, messages):
+## ML2-NL3-NOOPFLEX functions
+def ml2_nl3_noopflex_create_gbp_pkgs_install_manifests(config, messages):
+    global api_hosts, network_hosts, compute_hosts, q_hosts
+
+    for qhost in q_hosts:
+        manifest_file = "%s_gbp_ml2_nl3_noopflex.pp" % (qhost)
+        manifest_data = getManifestTemplate("ml2_nl3_noopflex_pkgs_install")
+        appendManifestFile(manifest_file, manifest_data, 'gbp')
+
+def ml2_nl3_noopflex_create_gbp_neutron_config_manifests(config, messages):
+    global api_hosts, network_hosts, compute_hosts, q_hosts
+
+    for xhost in api_hosts: 
+	manifest_file = "%s_gbp_ml2_nl3_noopflex.pp" % (xhost,)
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_neutron_conf")
+	appendManifestFile(manifest_file, manifest_data, 'gbp')
+
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_neutron_ml2_conf")
+	appendManifestFile(manifest_file, manifest_data, 'gbp')
+
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_neutron_ml2_conf_cisco")
+	appendManifestFile(manifest_file, manifest_data, 'gbp')
+
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_neutron_nova_api")
+	appendManifestFile(manifest_file, manifest_data, 'gbp')
+
+    for xhost in network_hosts:
+	manifest_file = "%s_gbp_ml2_nl3_noopflex.pp" % (xhost,)
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_neutron_dhcp_agent")
+	appendManifestFile(manifest_file, manifest_data, 'gbp')
+
+
+def ml2_nl3_noopflex_create_gbp_nova_config_manifests(config, messages):
+    global api_hosts, compute_hosts
+    for xhost in compute_hosts:
+	manifest_file = "%s_gbp_ml2_nl3_noopflex.pp" % (xhost,)
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_nova")
+	appendManifestFile(manifest_file, manifest_data, "gbp")
+
+def ml2_nl3_noopflex_create_gbp_ui_manifests(config, messages):
+    global api_hosts
+    for xhost in api_hosts:
+	manifest_file = "%s_gbp_ml2_nl3_noopflex.pp" % (xhost,)
+	manifest_data = getManifestTemplate("ml2_nl3_noopflex_gbp_automation_ui")
+	appendManifestFile(manifest_file, manifest_data, "gbp")
+
+## OPFLEX functions
+def opflex_create_gbp_pkgs_install_manifests(config, messages):
     global api_hosts, network_hosts, compute_hosts, q_hosts
 
     #all common packages for any type of hosts
@@ -191,17 +252,13 @@ def create_gbp_pkgs_install_manifests(config, messages):
 	manifest_data = getManifestTemplate("gbp_pkgs_install")
 	appendManifestFile(manifest_file, manifest_data, 'gbp')
 
-    #for computes and network install opflex
-    if config['CONFIG_GBP_USE_OPFLEX'] != 'y':
-	return
-
     for xhost in network_hosts | compute_hosts:
 	manifest_file = "%s_gbp.pp" % (xhost,)
 	manifest_data = getManifestTemplate("gbp_opflex_install")
 	appendManifestFile(manifest_file, manifest_data, 'gbp')
 
 
-def create_gbp_neutron_config_manifests(config, messages):
+def opflex_create_gbp_neutron_config_manifests(config, messages):
     global api_hosts, network_hosts, compute_hosts
 
     for xhost in api_hosts | network_hosts:
