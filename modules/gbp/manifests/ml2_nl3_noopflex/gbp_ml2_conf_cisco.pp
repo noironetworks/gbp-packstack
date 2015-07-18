@@ -7,12 +7,14 @@ class gbp::ml2_nl3_noopflex::gbp_ml2_conf_cisco() {
      'ml2_cisco_apic/apic_use_ssl': value => True;
      'ml2_cisco_apic/use_vmm': value => True;
      'ml2_cisco_apic/apic_clear_node_profiles': value => True;
-     'ml2_cisco_apic/apic_app_profile_name': value => "noiro";
      'ml2_cisco_apic/apic_model': value => "neutron.plugins.ml2.drivers.cisco.apic.apic_model";
      'ml2_cisco_apic/apic_name_mapping': value => "use_name";
      'ml2_cisco_apic/root_helper': value => 'sudo';
      'ml2_cisco_apic/enable_aci_routing': value => False;
      'ml2_cisco_apic/enable_arp_flooding': value => True;
+     'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
+     'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab';
+     'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab';
    }
      #'ml2_cisco_apic/scope_names': value => False;
 
@@ -25,11 +27,13 @@ class gbp::ml2_nl3_noopflex::gbp_ml2_conf_cisco() {
 
    define a_s_c_t_n_c_1($swarr) {
       $plist = $swarr[$name]
-      a_s_c_t_n_c_2 {$plist: sid => $name}
+      $local_names = regsubst($plist, '$', "-$name")
+      a_s_c_t_n_c_2 {$local_names: sid => $name}
    }
 
    define a_s_c_t_n_c_2($sid) {
-      $arr = split($name, ':')
+      $orig_name = regsubst($name, '-[0-9]+$', '')
+      $arr = split($orig_name, ':')
       $host = $arr[0]
       $swport = $arr[1]
       neutron_plugin_ml2_cisco {

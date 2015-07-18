@@ -24,6 +24,19 @@ PLUGIN_NAME_COLORED = utils.color_text(PLUGIN_NAME, 'blue')
 
 def initConfig(controller):
     params = [
+        {"CMD_OPTION": "apic-system-id",
+         "USAGE": ("APIC system id. Default is openstack. Valid values are any string"),
+         "PROMPT": "Enter the APIC system id.",
+         "OPTION_LIST": [],
+         "VALIDATORS": [validators.validate_not_empty],
+         "PROCESSORS": [],
+         "DEFAULT_VALUE": "openstack",
+         "MASK_INPUT": False,
+         "LOOSE_VALIDATION": True,
+         "CONF_NAME": "CONFIG_APIC_SYSTEM_ID",
+         "USE_DEFAULT": False,
+         "CONDITION": False},
+
         {"CMD_OPTION": "apic-host",
          "USAGE": ("The IP address of APIC controller"),
          "PROMPT": "Enter the IP address of the APIC controller",

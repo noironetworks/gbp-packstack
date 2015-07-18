@@ -1,22 +1,25 @@
-class gbp::gbp_neutron_conf() {
+class gbp::gbp_neutron_conf(
+    $apic_system_id = hiera('CONFIG_APIC_SYSTEM_ID'),
+) {
 
    neutron_config {
      'DEFAULT/default_log_levels': value => "neutron.context=ERROR";
-     'DEFAULT/apic_system_id': value => "openstack";
+     'DEFAULT/apic_system_id': value => $apic_system_id;
      'DEFAULT/service_plugins': value => 'group_policy,servicechain,router,lbaas';
      'opflex/networks': value => '*';
      'ml2_cisco_apic/vni_ranges': value => '11000:11100';
      'ml2_cisco_apic/apic_hosts': value => hiera('CONFIG_APIC_CONTROLLER');
      'ml2_cisco_apic/apic_username': value => hiera('CONFIG_APIC_USERNAME');
      'ml2_cisco_apic/apic_password': value => hiera('CONFIG_APIC_PW');
-     'ml2_cisco_apic/scope_names': value => False;
      'ml2_cisco_apic/use_vmm': value => True;
      'ml2_cisco_apic/apic_use_ssl': value => True;
      'ml2_cisco_apic/apic_clear_node_profiles': value => True;
-     'ml2_cisco_apic/apic_app_profile_name': value => "noiro";
      'ml2_cisco_apic/enable_aci_routing': value => True;
      'ml2_cisco_apic/enable_arp_flooding': value => True;
      'ml2_cisco_apic/apic_name_mapping': value => "use_name";
+     'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
+     'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab';
+     'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab';
      'group_policy/policy_drivers': value => 'implicit_policy,apic';
      'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
      'appliance_driver/svc_management_ptg_name': value => "Service-Management";
@@ -32,11 +35,13 @@ class gbp::gbp_neutron_conf() {
 
    define a_s_c_t_n_c_1($swarr) {
       $plist = $swarr[$name]
-      a_s_c_t_n_c_2 {$plist: sid => $name}
+      $local_names = regsubst($plist, '$', "-$name")
+      a_s_c_t_n_c_2 {$local_names: sid => $name}
    }
 
    define a_s_c_t_n_c_2($sid) {
-      $arr = split($name, ':')
+      $orig_name = regsubst($name, '-[0-9]+$', '')
+      $arr = split($orig_name, ':')
       $host = $arr[0]
       $swport = $arr[1]
       neutron_config {
