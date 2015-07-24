@@ -1,5 +1,8 @@
 class gbp::gbp_neutron_conf(
     $apic_system_id = hiera('CONFIG_APIC_SYSTEM_ID'),
+    $apic_provision_infra = hiera('CONFIG_APIC_PROVISION_INFRA'),
+    $apic_provision_hostlinks = hiera('CONFIG_APIC_PROVISION_HOSTLINKS'),
+    $apic_vpc_pairs = hiera('CONFIG_APIC_VPC_PAIRS'),
 ) {
 
    neutron_config {
@@ -20,6 +23,9 @@ class gbp::gbp_neutron_conf(
      'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
      'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab';
      'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab';
+     'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
+     'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
+     'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
      'group_policy/policy_drivers': value => 'implicit_policy,apic';
      'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
      'appliance_driver/svc_management_ptg_name': value => "Service-Management";

@@ -1,4 +1,8 @@
-class gbp::ml2_nl3_noopflex::gbp_ml2_conf_cisco() {
+class gbp::ml2_nl3_noopflex::gbp_ml2_conf_cisco(
+    $apic_provision_infra = hiera('CONFIG_APIC_PROVISION_INFRA'),
+    $apic_provision_hostlinks = hiera('CONFIG_APIC_PROVISION_HOSTLINKS'),
+    $apic_vpc_pairs = hiera('CONFIG_APIC_VPC_PAIRS'),
+) {
 
    neutron_plugin_ml2_cisco {
      'ml2_cisco_apic/apic_hosts': value => hiera('CONFIG_APIC_CONTROLLER');
@@ -15,6 +19,9 @@ class gbp::ml2_nl3_noopflex::gbp_ml2_conf_cisco() {
      'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
      'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab';
      'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab';
+     'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
+     'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
+     'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
    }
      #'ml2_cisco_apic/scope_names': value => False;
 
