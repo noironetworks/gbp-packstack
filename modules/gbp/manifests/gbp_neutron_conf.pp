@@ -1,8 +1,12 @@
 class gbp::gbp_neutron_conf(
+    $apic_controller = hiera('CONFIG_APIC_CONTROLLER'),
+    $apic_username = hiera('CONFIG_APIC_USERNAME'),
+    $apic_password = hiera('CONFIG_APIC_PW'),
     $apic_system_id = hiera('CONFIG_APIC_SYSTEM_ID'),
     $apic_provision_infra = hiera('CONFIG_APIC_PROVISION_INFRA'),
     $apic_provision_hostlinks = hiera('CONFIG_APIC_PROVISION_HOSTLINKS'),
     $apic_vpc_pairs = hiera('CONFIG_APIC_VPC_PAIRS'),
+    $apic_domain_name = hiera('CONFIG_APIC_DOMAIN_NAME'),
 ) {
 
    neutron_config {
@@ -11,9 +15,10 @@ class gbp::gbp_neutron_conf(
      'DEFAULT/service_plugins': value => 'group_policy,servicechain,router,lbaas';
      'opflex/networks': value => '*';
      'ml2_cisco_apic/vni_ranges': value => '11000:11100';
-     'ml2_cisco_apic/apic_hosts': value => hiera('CONFIG_APIC_CONTROLLER');
-     'ml2_cisco_apic/apic_username': value => hiera('CONFIG_APIC_USERNAME');
-     'ml2_cisco_apic/apic_password': value => hiera('CONFIG_APIC_PW');
+     'ml2_cisco_apic/apic_hosts': value => $apic_controller;
+     'ml2_cisco_apic/apic_username': value => $apic_username;
+     'ml2_cisco_apic/apic_password': value => $apic_password;
+     'ml2_cisco_apic/apic_domain_name': value => $apic_domain_name;
      'ml2_cisco_apic/use_vmm': value => True;
      'ml2_cisco_apic/apic_use_ssl': value => True;
      'ml2_cisco_apic/apic_clear_node_profiles': value => True;
@@ -21,8 +26,8 @@ class gbp::gbp_neutron_conf(
      'ml2_cisco_apic/enable_arp_flooding': value => True;
      'ml2_cisco_apic/apic_name_mapping': value => "use_name";
      'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
-     'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab';
-     'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab';
+     'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab_vmm';
+     'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab_app';
      'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
      'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
      'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;

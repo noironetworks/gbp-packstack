@@ -9,7 +9,7 @@ class gbp::ml2_nl3_noopflex::gbp_ml2_conf_cisco(
      'ml2_cisco_apic/apic_username': value => hiera('CONFIG_APIC_USERNAME');
      'ml2_cisco_apic/apic_password': value => hiera('CONFIG_APIC_PW');
      'ml2_cisco_apic/apic_use_ssl': value => True;
-     'ml2_cisco_apic/use_vmm': value => True;
+     'ml2_cisco_apic/use_vmm': value => False;
      'ml2_cisco_apic/apic_clear_node_profiles': value => True;
      'ml2_cisco_apic/apic_model': value => "neutron.plugins.ml2.drivers.cisco.apic.apic_model";
      'ml2_cisco_apic/apic_name_mapping': value => "use_name";

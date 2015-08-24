@@ -6,7 +6,7 @@ class gbp::opflex_agent(
   $opflex_endpoint_dir = '/var/lib/opflex-agent-ovs/endpoints',
   $opflex_ovs_bridge_name = 'br-int',
   $opflex_encap_iface = 'br-int_vxlan0',
-  $opflex_uplink_iface = 'opflex1.4093',
+  $opflex_uplink_iface = hiera('CONFIG_GBP_OPFLEX_UPLINK_INTERFACE'),
   $opflex_uplink_vlan = '4093',
   $opflex_remote_ip = '10.0.0.32',
   $opflex_remote_port = '8472',
@@ -16,6 +16,7 @@ class gbp::opflex_agent(
   $opflex_virtual_dhcp_enabled = 'true',
   $opflex_virtual_dhcp_mac = '00:22:bd:f8:19:ff',
   $opflex_cache_dir = '/var/lib/opflex-agent-ovs/ids',
+  $opflex_apic_domain_name = hiera('CONFIG_APIC_DOMAIN_NAME'),
 ) {
 
    if !defined(Package['neutron-opflex-agent']) {

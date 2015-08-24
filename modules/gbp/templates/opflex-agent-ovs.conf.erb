@@ -4,7 +4,7 @@
     },
 
     "opflex": {
-       "domain": "comp/prov-OpenStack/ctrlr-[openstack]-openstack/sw-InsiemeLSOid",
+    "domain": "comp/prov-OpenStack/ctrlr-[<%= @opflex_apic_domain_name %>]-<%= @opflex_apic_domain_name %>/sw-InsiemeLSOid",
        "name": "<%= @hostname %>",
        "peers": [
           {"hostname": "<%= @opflex_peer_ip %>", "port": "<%= @opflex_peer_port %>"}
@@ -26,8 +26,7 @@
              "encap": {
                  "vxlan" : {
                      "encap-iface": "<%= @opflex_encap_iface %>",
-
-                     "uplink-iface": "<%= @opflex_uplink_iface %>",
+		     "uplink-iface": "<%= @opflex_uplink_iface%>.<%= @opflex_uplink_vlan %>",
                      "uplink-vlan": <%= @opflex_uplink_vlan %>,
                      "remote-ip": "<%= @opflex_remote_ip %>",
                      "remote-port": <%= @opflex_remote_port %>

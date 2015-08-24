@@ -37,6 +37,19 @@ def initConfig(controller):
          "USE_DEFAULT": False,
          "CONDITION": False},
 
+        {"CMD_OPTION": "apic-domain-name",
+         "USAGE": ("APIC domain name. Default is ostack. Valid values are any string"),
+         "PROMPT": "Enter the APIC domain name.",
+         "OPTION_LIST": [],
+         "VALIDATORS": [validators.validate_not_empty],
+         "PROCESSORS": [],
+         "DEFAULT_VALUE": "ostack",
+         "MASK_INPUT": False,
+         "LOOSE_VALIDATION": True,
+         "CONF_NAME": "CONFIG_APIC_DOMAIN_NAME",
+         "USE_DEFAULT": True,
+         "CONDITION": False},
+
         {"CMD_OPTION": "apic-provision-infra",
          "USAGE": ("Provision apic infrastructre. Default is True"),
          "PROMPT": "Enter True or False",
@@ -134,7 +147,7 @@ def initConfig(controller):
          "USAGE": "VPC pairs, if setup uses vpc, eg 101:102,103:104",
          "PROMPT": "APIC vpc pairs:",
          "OPTION_LIST": [],
-         "VALIDATORS": [validators.validate_not_empty],
+         "VALIDATORS": [],
          "PROCESSORS": [],
          "DEFAULT_VALUE": "",
          "MASK_INPUT": False,
@@ -157,6 +170,21 @@ def initConfig(controller):
          "NEED_CONFIRM": False,
          "CONDITION": False},
        
+        {"CMD_OPTION": "gbp-opflex-uplink-interface",
+         "USAGE": ("Server interface name which is connected to Leaf switch"
+                   "Example: 'eth3', 'bond0', Default: eth0"),
+         "PROMPT": "Server interface name connected to leaf",
+         "OPTION_LIST": [],
+         "VALIDATORS": [],
+         "PROCESSORS": [],
+         "DEFAULT_VALUE": "eth0",
+         "MASK_INPUT": False,
+         "LOOSE_VALIDATION": False,
+         "CONF_NAME": "CONFIG_GBP_OPFLEX_UPLINK_INTERFACE",
+         "USE_DEFAULT": True,
+         "NEED_CONFIRM": False,
+         "CONDITION": False},
+
         {"CMD_OPTION": "apic-conn-json",
          "USAGE": ( "String describing the server connections to switches in JSON format"
                     "Example { 301: [f3-compute-1.cisco.com:1/33, f3-compute-2.cisco.com:1/34], 302:[f3-compute-1:1/1] }"
