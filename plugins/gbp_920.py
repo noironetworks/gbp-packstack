@@ -185,6 +185,20 @@ def initConfig(controller):
          "NEED_CONFIRM": False,
          "CONDITION": False},
 
+        {"CMD_OPTION": "apic-use-lldp",
+         "USAGE": ("Use lldp to detect compute hosts"),
+         "PROMPT": "Use lldp to detect the interface connections between computes and apic. Enter True or False. Default is True",
+         "OPTION_LIST": ['True', 'False'],
+         "VALIDATORS": [],
+         "PROCESSORS": [],
+         "DEFAULT_VALUE": "True",
+         "MASK_INPUT": False,
+         "LOOSE_VALIDATION": False,
+         "CONF_NAME": "CONFIG_GBP_USE_LLDP",
+         "USE_DEFAULT": True,
+         "NEED_CONFIRM": False,
+         "CONDITION": False},
+
         {"CMD_OPTION": "apic-conn-json",
          "USAGE": ( "String describing the server connections to switches in JSON format"
                     "Example { 301: [f3-compute-1.cisco.com:1/33, f3-compute-2.cisco.com:1/34], 302:[f3-compute-1:1/1] }"
@@ -354,6 +368,9 @@ def opflex_create_gbp_neutron_config_manifests(config, messages):
 	manifest_data = getManifestTemplate("gbp_neutron_ovs")
 	appendManifestFile(manifest_file, manifest_data, "gbp")
 
+	manifest_data = getManifestTemplate("gbp_cisco_host_agent")
+	appendManifestFile(manifest_file, manifest_data, "gbp")
+
     for xhost in api_hosts:
 	manifest_file = "%s_gbp.pp" % (xhost,)
         manifest_data = getManifestTemplate("gbp_neutron_ml2")
@@ -362,6 +379,8 @@ def opflex_create_gbp_neutron_config_manifests(config, messages):
 	manifest_data = getManifestTemplate("gbp_neutron_nova_api")
 	appendManifestFile(manifest_file, manifest_data, "gbp")
 
+	manifest_data = getManifestTemplate("gbp_cisco_service_agent")
+	appendManifestFile(manifest_file, manifest_data, "gbp")
 
 def create_gbp_nova_config_manifests(config, messages):
     global api_hosts, compute_hosts

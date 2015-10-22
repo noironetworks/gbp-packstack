@@ -12,7 +12,9 @@ class gbp::gbp_neutron_conf(
    neutron_config {
      'DEFAULT/default_log_levels': value => "neutron.context=ERROR";
      'DEFAULT/apic_system_id': value => $apic_system_id;
-     'DEFAULT/service_plugins': value => 'group_policy,servicechain,router,lbaas';
+     'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_gbp_l3,lbaas';
+     'DEFAULT/state_path': value => '/var/lib/neutron';
+     'DEFAULT/lock_path': value => '$state_path/lock';
      'opflex/networks': value => '*';
      'ml2_cisco_apic/vni_ranges': value => '11000:11100';
      'ml2_cisco_apic/apic_hosts': value => $apic_controller;
@@ -31,36 +33,41 @@ class gbp::gbp_neutron_conf(
      'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
      'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
      'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
+     'ml2_cisco_apic/root_helper': value => 'sudo neutron-rootwrap /etc/neutron/rootwrap.conf';
      'group_policy/policy_drivers': value => 'implicit_policy,apic';
      'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
      'appliance_driver/svc_management_ptg_name': value => "Service-Management";
    }
      #'servicechain/servicechain_drivers': value => "chain_with_two_arm_appliance_driver";
 
+   define add_switch_conn_to_neutron_conf($sa) {
+       $sid = keys($sa)
+       a_s_c_t_n_c_1{$sid: swarr => $sa}
+   }
+    
+   define a_s_c_t_n_c_1($swarr) {
+       $plist = $swarr[$name]
+       $local_names = regsubst($plist, '$', "-$name")
+       a_s_c_t_n_c_2 {$local_names: sid => $name}
+   }
+    
+   define a_s_c_t_n_c_2($sid) {
+       $orig_name = regsubst($name, '-[0-9]+$', '')
+       $arr = split($orig_name, ':')
+       $host = $arr[0]
+       $swport = $arr[1]
+       neutron_config {
+          "apic_switch:$sid/$host": value => $swport;
+       }
+   }
+    
+   $use_lldp = hiera('CONFIG_GBP_USE_LLDP')
    $swarr = parsejson(hiera('CONFIG_APIC_CONN_JSON'))
 
-   define add_switch_conn_to_neutron_conf($sa) {
-      $sid = keys($sa)
-      a_s_c_t_n_c_1{$sid: swarr => $sa}
+   if ($use_lldp == "True") {
+   } else {
+       add_switch_conn_to_neutron_conf{'xyz': sa => $swarr}
    }
-
-   define a_s_c_t_n_c_1($swarr) {
-      $plist = $swarr[$name]
-      $local_names = regsubst($plist, '$', "-$name")
-      a_s_c_t_n_c_2 {$local_names: sid => $name}
-   }
-
-   define a_s_c_t_n_c_2($sid) {
-      $orig_name = regsubst($name, '-[0-9]+$', '')
-      $arr = split($orig_name, ':')
-      $host = $arr[0]
-      $swport = $arr[1]
-      neutron_config {
-        "apic_switch:$sid/$host": value => $swport;
-      }
-   }
-
-   add_switch_conn_to_neutron_conf{'xyz': sa => $swarr}
 
    $extnet_arr = parsejson(hiera('CONFIG_APIC_EXTNET_JSON'))
 

@@ -26,21 +26,33 @@ class gbp::opflex_agent(
       }
    }
 
+#   package {'remove_neutron_openvswitch':
+#      ensure => absent,
+#      name   => 'openstack-neutron-openvswitch',
+#   }
+
+#   package {'remove_stock_openvswitch':
+#      ensure  => absent,
+#      name    => 'openvswitch',
+#      provider => yum,
+#   }
+
    package {'openvswitch-gbp':
       ensure => installed,
       provider => yum,
    }
+# require => Package['remove_stock_openvswitch'],
 
-   exec {'rmmod_openvswitch':
-     command => "/usr/sbin/rmmod openvswitch",
-     require => Package['openvswitch-gbp'],
-   }
+#   exec {'rmmod_openvswitch':
+#     command => "/usr/sbin/rmmod openvswitch",
+#     require => Package['openvswitch-gbp'],
+#   }
  
-   exec {'modprobe-openvswitch':
-     command => "/usr/sbin/modprobe openvswitch",
-     require => Exec['rmmod_openvswitch'],
-     notify => Service['openvswitch'],
-   }
+#   exec {'modprobe-openvswitch':
+#     command => "/usr/sbin/modprobe openvswitch",
+#     require => Exec['rmmod_openvswitch'],
+#     notify => Service['openvswitch'],
+#   }
 
    service {'openvswitch':
       ensure => running,

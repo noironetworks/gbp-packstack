@@ -43,4 +43,11 @@ class gbp() {
       }
    }
 
+   if !defined(Package['neutron-ml2-driver-apic']) {
+      package {'neutron-ml2-driver-apic':
+         ensure => installed,
+         provider => yum,
+      }
+   }
+
 }
