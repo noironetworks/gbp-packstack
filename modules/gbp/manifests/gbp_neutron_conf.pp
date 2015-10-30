@@ -7,6 +7,9 @@ class gbp::gbp_neutron_conf(
     $apic_provision_hostlinks = hiera('CONFIG_APIC_PROVISION_HOSTLINKS'),
     $apic_vpc_pairs = hiera('CONFIG_APIC_VPC_PAIRS'),
     $apic_domain_name = hiera('CONFIG_APIC_DOMAIN_NAME'),
+    $apic_entity_profile = hiera('CONFIG_APIC_ENTITY_PROFILE'),
+    $apic_vmm_domain = hiera('CONFIG_APIC_VMM_DOMAIN'),
+    $apic_app_profile_name = hiera('CONFIG_APIC_APP_PROFILE_NAME'),
 ) {
 
    neutron_config {
@@ -27,9 +30,9 @@ class gbp::gbp_neutron_conf(
      'ml2_cisco_apic/enable_aci_routing': value => True;
      'ml2_cisco_apic/enable_arp_flooding': value => True;
      'ml2_cisco_apic/apic_name_mapping': value => "use_name";
-     'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
-     'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab_vmm';
-     'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab_app';
+     'ml2_cisco_apic/apic_entity_profile': value => $apic_entity_profile;
+     'ml2_cisco_apic/apic_vmm_domain': value => $apic_vmm_domain;
+     'ml2_cisco_apic/apic_app_profile_name': value => $apic_app_profile_name;
      'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
      'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
      'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
