@@ -1,0 +1,26 @@
+{
+    "opflex": {
+        "domain": "comp/prov-OpenStack/ctrlr-[<%= @opflex_apic_domain_name %>]-<%= @opflex_apic_domain_name %>/sw-InsiemeLSOid",
+        "name": "<%= @hostname %>",
+        "peers": [
+            {"hostname": "<%= @opflex_peer_ip %>", "port": "<%= @opflex_peer_port %>"}
+        ],
+        "ssl": {
+            "mode": "<%= @opflex_ssl_mode %>",
+            "ca-store": "/etc/ssl/certs/"
+        }
+    },
+    "inspector": {
+        "enabled": true,
+        "socket-name": "/var/run/opflex-agent-ovs-inspect.sock"
+    },
+    "notif": {
+        "enabled": true,
+        "socket-name": "/var/run/opflex-agent-ovs-notif.sock",
+        "socket-group": "opflexep",
+        "socket-permissions": "770"
+    },
+    "endpoint-sources": {
+        "filesystem": ["<%= @opflex_endpoint_dir %>"]
+    }
+}

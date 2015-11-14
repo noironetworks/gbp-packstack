@@ -76,24 +76,46 @@ class gbp::opflex_agent(
       require => [Package['neutron-opflex-agent'], Service['neutron-openvswitch-agent']],
    }
    
-   file {'agent-conf':
-     path => '/etc/opflex-agent-ovs/opflex-agent-ovs.conf',
+   file {'opflex-log-level-conf':
+     path => '/etc/opflex-agent-ovs/conf.d/10-opflex-log-level.conf',
      mode => '0644',
-     content => template('gbp/opflex-agent-ovs.conf.erb'),
+     content => template('gbp/10-opflex-log-level.conf.erb'),
+     require => Package['agent-ovs'],
+   }
+
+   file {'opflex-connection-conf':
+     path => '/etc/opflex-agent-ovs/conf.d/20-opflex-connection.conf',
+     mode => '0644',
+     content => template('gbp/20-opflex-connection.conf.erb'),
+     require => Package['agent-ovs'],
+   }
+
+   file {'vxlan-aci-renderer-conf':
+     path => '/etc/opflex-agent-ovs/conf.d/30-vxlan-aci-renderer.conf',
+     mode => '0644',
+     content => template('gbp/30-vxlan-aci-renderer.conf.erb'),
      require => Package['agent-ovs'],
    }
 
    service {'agent-ovs':
      ensure => running,
      enable => true,
-     require => File['agent-conf'],
+     require => [
+      File['opflex-log-level-conf'],
+      File['opflex-connection-conf'],
+      File['vxlan-aci-renderer-conf'],
+      ]
    }
 
    exec {'add_vxlan_port':
       command => "/usr/bin/ovs-vsctl add-port $opflex_ovs_bridge_name $opflex_encap_iface -- set Interface $opflex_encap_iface type=vxlan options:remote_ip=flow options:key=flow options:dst_port=8472",
       onlyif => "/usr/bin/ovs-vsctl show | /bin/grep $opflex_encap_iface | /usr/bin/wc -l",
       returns => [0,1,2],
-     require => File['agent-conf'],
+     require => [
+      File['opflex-log-level-conf'],
+      File['opflex-connection-conf'],
+      File['vxlan-aci-renderer-conf'],
+      ]
    }
 
 
