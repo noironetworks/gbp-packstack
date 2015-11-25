@@ -77,7 +77,7 @@ class gbp::opflex_agent(
    }
    
    file {'agent-conf':
-     path => '/etc/opflex-agent-ovs/opflex-agent-ovs.conf',
+     path => '/etc/opflex-agent-ovs/conf.d/opflex-agent-ovs.conf',
      mode => '0644',
      content => template('gbp/opflex-agent-ovs.conf.erb'),
      require => Package['agent-ovs'],
