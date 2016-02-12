@@ -1,9 +1,9 @@
 class gbp::gbp_neutron_ovs() {
 
-   neutron_plugin_ovs {
-     'ovs/enable_tunneling': value => false;
-     'ovs/integration_bridge': value => 'br-int';
-   }
+   #neutron_plugin_ovs {
+   #  'ovs/enable_tunneling': value => false;
+   #  'ovs/integration_bridge': value => 'br-int';
+   #}
 
    ini_setting { 'try1':
       ensure => absent,

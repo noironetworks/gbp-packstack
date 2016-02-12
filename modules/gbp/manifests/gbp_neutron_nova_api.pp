@@ -16,7 +16,6 @@ class gbp::gbp_neutron_nova_api () {
 
    nova_config {
      'neutron/allow_duplicate_networks': value => "true";
-     'DEFAULT/vendordata_driver': value => "gbpservice.nova.api.metadata.service_metadata.ServiceVendorData";
    }
 
    service {'openstack-nova-api':
