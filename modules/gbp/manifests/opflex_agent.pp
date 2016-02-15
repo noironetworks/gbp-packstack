@@ -89,6 +89,9 @@ class gbp::opflex_agent(
      require => File['agent-conf'],
    }
 
+   exec {'fix_bridge_openflow_version':
+      command => "/usr/bin/ovs-vsctl set bridge $opflex_ovs_bridge_name protocols=[]",
+   }
    exec {'add_vxlan_port':
       command => "/usr/bin/ovs-vsctl add-port $opflex_ovs_bridge_name $opflex_encap_iface -- set Interface $opflex_encap_iface type=vxlan options:remote_ip=flow options:key=flow options:dst_port=8472",
       onlyif => "/usr/bin/ovs-vsctl show | /bin/grep $opflex_encap_iface | /usr/bin/wc -l",
