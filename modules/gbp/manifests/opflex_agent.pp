@@ -26,43 +26,46 @@ class gbp::opflex_agent(
       }
    }
 
-#   package {'remove_neutron_openvswitch':
-#      ensure => absent,
-#      name   => 'openstack-neutron-openvswitch',
-#   }
 
-#   package {'remove_stock_openvswitch':
-#      ensure  => absent,
-#      name    => 'openvswitch',
-#      provider => yum,
-#   }
+   $krel = $::kernelrelease
 
-   package {'openvswitch-gbp':
-      ensure => installed,
-      provider => yum,
+   if $krel == '3.10.0-229.1.2.el7.x86_64' or $krel == '3.10.0-229.20.1.el7.x86_64' {
+      package {'openvswitch-gbp':
+         ensure => installed,
+         provider => yum,
+      }
+   } else {
+      package {'openvswitch':
+         ensure => installed,
+         provider => yum,
+      }
+      package {'openvswitch-gbp-lib':
+         ensure => installed,
+         provider => yum,
+      }
+      package {'openvswitch-gbp-devel':
+         ensure => installed,
+         provider => yum,
+      }
    }
-# require => Package['remove_stock_openvswitch'],
-
-#   exec {'rmmod_openvswitch':
-#     command => "/usr/sbin/rmmod openvswitch",
-#     require => Package['openvswitch-gbp'],
-#   }
- 
-#   exec {'modprobe-openvswitch':
-#     command => "/usr/sbin/modprobe openvswitch",
-#     require => Exec['rmmod_openvswitch'],
-#     notify => Service['openvswitch'],
-#   }
 
    service {'openvswitch':
       ensure => running,
       enable => true,
    }
  
-   package {'agent-ovs':
-      ensure => installed,
-      provider => yum,
-      require => Package['openvswitch-gbp'],
+   if $krel == '3.10.0-229.1.2.el7.x86_64' or $krel == '3.10.0-229.20.1.el7.x86_64' {
+      package {'agent-ovs':
+         ensure => installed,
+         provider => yum,
+         require => Package['openvswitch-gbp'],
+      }
+   } else {
+      package {'agent-ovs':
+         ensure => installed,
+         provider => yum,
+         require => Package['openvswitch'],
+      }
    }
 
    service {'neutron-openvswitch-agent':
