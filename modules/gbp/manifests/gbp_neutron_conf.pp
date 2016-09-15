@@ -12,7 +12,7 @@ class gbp::gbp_neutron_conf(
    neutron_config {
      'DEFAULT/default_log_levels': value => "neutron.context=ERROR";
      'DEFAULT/apic_system_id': value => $apic_system_id;
-     'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_gbp_l3,lbaas';
+     'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_gbp_l3';
      'DEFAULT/state_path': value => '/var/lib/neutron';
      'DEFAULT/lock_path': value => '$state_path/lock';
      'opflex/networks': value => '*';
