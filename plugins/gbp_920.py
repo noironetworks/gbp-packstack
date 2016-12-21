@@ -231,6 +231,19 @@ def initConfig(controller):
          "NEED_CONFIRM": True,
          "CONDITION": False},
 
+        {"CMD_OPTION": "enable-aim",
+         "USAGE": ("Enable AIM plugin"),
+         "PROMPT": "Enable AIM plugin. Enter True or False. Default is False",
+         "OPTION_LIST": ['True', 'False'],
+         "VALIDATORS": [],
+         "PROCESSORS": [],
+         "DEFAULT_VALUE": "False",
+         "MASK_INPUT": False,
+         "LOOSE_VALIDATION": False,
+         "CONF_NAME": "CONFIG_ENABLE_AIM",
+         "USE_DEFAULT": True,
+         "NEED_CONFIRM": False,
+         "CONDITION": False},
 
     ]
     group = {"GROUP_NAME": "GBP",
@@ -263,6 +276,8 @@ def initSequences(controller):
         gbpsteps = [
             {'title': 'Adding GBP packages installation manifest entries',
              'functions': [opflex_create_gbp_pkgs_install_manifests]},
+            {'title': 'Adding GBP AIM plugin manifest entries',
+             'functions': [create_gbp_aim_manifests]},
             {'title': 'Adding GBP neutron configuration manifest entries',
              'functions': [opflex_create_gbp_neutron_config_manifests]},
             {'title': 'Adding GBP nova configuration manifest entries',
@@ -394,5 +409,12 @@ def create_gbp_ui_manifests(config, messages):
     for xhost in api_hosts:
 	manifest_file = "%s_gbp.pp" % (xhost,)
 	manifest_data = getManifestTemplate("gbp_automation_ui")
+	appendManifestFile(manifest_file, manifest_data, "gbp")
+
+def create_gbp_aim_manifests(config, messages):
+    global api_hosts
+    for xhost in api_hosts:
+	manifest_file = "%s_gbp.pp" % (xhost,)
+	manifest_data = getManifestTemplate("gbp_aim")
 	appendManifestFile(manifest_file, manifest_data, "gbp")
 

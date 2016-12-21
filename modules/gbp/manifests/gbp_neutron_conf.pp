@@ -7,38 +7,79 @@ class gbp::gbp_neutron_conf(
     $apic_provision_hostlinks = hiera('CONFIG_APIC_PROVISION_HOSTLINKS'),
     $apic_vpc_pairs = hiera('CONFIG_APIC_VPC_PAIRS'),
     $apic_domain_name = hiera('CONFIG_APIC_DOMAIN_NAME'),
+    $enable_aim = hiera('CONFIG_ENABLE_AIM')
 ) {
+
+   $k_auth_url = hiera('CONFIG_KEYSTONE_ADMIN_URL')
 
    neutron_config {
      'DEFAULT/default_log_levels': value => "neutron.context=ERROR";
      'DEFAULT/apic_system_id': value => $apic_system_id;
-     'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_gbp_l3';
      'DEFAULT/state_path': value => '/var/lib/neutron';
      'DEFAULT/lock_path': value => '$state_path/lock';
      'opflex/networks': value => '*';
-     'ml2_cisco_apic/vni_ranges': value => '11000:11100';
-     'ml2_cisco_apic/apic_hosts': value => $apic_controller;
-     'ml2_cisco_apic/apic_username': value => $apic_username;
-     'ml2_cisco_apic/apic_password': value => $apic_password;
-     'ml2_cisco_apic/apic_domain_name': value => $apic_domain_name;
-     'ml2_cisco_apic/use_vmm': value => True;
-     'ml2_cisco_apic/apic_use_ssl': value => True;
-     'ml2_cisco_apic/apic_clear_node_profiles': value => True;
-     'ml2_cisco_apic/enable_aci_routing': value => True;
-     'ml2_cisco_apic/enable_arp_flooding': value => True;
-     'ml2_cisco_apic/apic_name_mapping': value => "use_name";
-     'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
-     'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab_vmm';
-     'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab_app';
-     'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
-     'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
-     'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
      'ml2_cisco_apic/root_helper': value => 'sudo neutron-rootwrap /etc/neutron/rootwrap.conf';
-     'group_policy/policy_drivers': value => 'implicit_policy,apic';
-     'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
      'appliance_driver/svc_management_ptg_name': value => "Service-Management";
    }
-     #'servicechain/servicechain_drivers': value => "chain_with_two_arm_appliance_driver";
+
+   if $enable_aim {
+     neutron_config {
+       'DEFAULT/core_plugin':   value => 'ml2plus';
+       'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_aim_l3';
+       'apic/vni_ranges': value => '11000:11100';
+       'apic/apic_hosts': value => $apic_controller;
+       'apic/apic_username': value => $apic_username;
+       'apic/apic_password': value => $apic_password;
+       'apic/apic_domain_name': value => $apic_domain_name;
+       'apic/use_vmm': value => True;
+       'apic/apic_use_ssl': value => True;
+       'apic/apic_clear_node_profiles': value => True;
+       'apic/enable_aci_routing': value => True;
+       'apic/enable_arp_flooding': value => True;
+       'apic/apic_name_mapping': value => "use_name";
+       'apic/apic_entity_profile': value => 'openstack_noirolab';
+       'apic/apic_vmm_domain': value => 'noirolab_vmm';
+       'apic/apic_app_profile_name': value => 'noirolab_app';
+       'apic/apic_provision_infra': value => $apic_provision_infra;
+       'apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
+       'apic/apic_vpc_pairs': value => $apic_vpc_pairs;
+       'apic/scope_names': value => False;
+       'apic_aim_auth/auth_plugin': value => 'v3password';
+       'apic_aim_auth/auth_url':   value => "$k_auth_url/v3";
+       'apic_aim_auth/username':   value => $apic_username;
+       'apic_aim_auth/password':   value => $apic_password;
+       'apic_aim_auth/user_domain_name':  value => 'default';
+       'apic_aim_auth/project_domain_name': value => 'default';
+       'apic_aim_auth/project_name': value => 'admin';
+       'apic_vmdom:ostack/encap_mode': value => 'vxlan';
+       'group_policy/policy_drivers': value => 'aim_mapping';
+       'group_policy/extension_drivers': value => 'aim_extension,proxy_group';
+     }
+   } else {
+     neutron_config {
+       'DEFAULT/core_plugin':   value => 'ml2';
+       'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_gbp_l3';
+       'ml2_cisco_apic/vni_ranges': value => '11000:11100';
+       'ml2_cisco_apic/apic_hosts': value => $apic_controller;
+       'ml2_cisco_apic/apic_username': value => $apic_username;
+       'ml2_cisco_apic/apic_password': value => $apic_password;
+       'ml2_cisco_apic/apic_domain_name': value => $apic_domain_name;
+       'ml2_cisco_apic/use_vmm': value => True;
+       'ml2_cisco_apic/apic_use_ssl': value => True;
+       'ml2_cisco_apic/apic_clear_node_profiles': value => True;
+       'ml2_cisco_apic/enable_aci_routing': value => True;
+       'ml2_cisco_apic/enable_arp_flooding': value => True;
+       'ml2_cisco_apic/apic_name_mapping': value => 'use_name';
+       'ml2_cisco_apic/apic_entity_profile': value => 'openstack_noirolab';
+       'ml2_cisco_apic/apic_vmm_domain': value => 'noirolab_vmm';
+       'ml2_cisco_apic/apic_app_profile_name': value => 'noirolab_app';
+       'ml2_cisco_apic/apic_provision_infra': value => $apic_provision_infra;
+       'ml2_cisco_apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
+       'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
+       'group_policy/policy_drivers': value => 'implicit_policy,apic';
+       'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
+     }
+   }
 
    define add_switch_conn_to_neutron_conf($sa) {
        $sid = keys($sa)

@@ -1,6 +1,7 @@
 # this is all temporary.. till the packages are available
 
-class gbp() {
+class gbp(
+) {
 
    if !defined(Package['python-pip']) {
       package { 'python-pip':
@@ -49,5 +50,4 @@ class gbp() {
          provider => yum,
       }
    }
-
 }
