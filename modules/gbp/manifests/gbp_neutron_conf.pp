@@ -22,36 +22,17 @@ class gbp::gbp_neutron_conf(
      'appliance_driver/svc_management_ptg_name': value => "Service-Management";
    }
 
-   if $enable_aim {
+   if $enable_aim == "True" {
      neutron_config {
        'DEFAULT/core_plugin':   value => 'ml2plus';
        'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_aim_l3';
-       'apic/vni_ranges': value => '11000:11100';
-       'apic/apic_hosts': value => $apic_controller;
-       'apic/apic_username': value => $apic_username;
-       'apic/apic_password': value => $apic_password;
-       'apic/apic_domain_name': value => $apic_domain_name;
-       'apic/use_vmm': value => True;
-       'apic/apic_use_ssl': value => True;
-       'apic/apic_clear_node_profiles': value => True;
-       'apic/enable_aci_routing': value => True;
-       'apic/enable_arp_flooding': value => True;
-       'apic/apic_name_mapping': value => "use_name";
-       'apic/apic_entity_profile': value => 'openstack_noirolab';
-       'apic/apic_vmm_domain': value => 'noirolab_vmm';
-       'apic/apic_app_profile_name': value => 'noirolab_app';
-       'apic/apic_provision_infra': value => $apic_provision_infra;
-       'apic/apic_provision_hostlinks': value => $apic_provision_hostlinks;
-       'apic/apic_vpc_pairs': value => $apic_vpc_pairs;
-       'apic/scope_names': value => False;
        'apic_aim_auth/auth_plugin': value => 'v3password';
        'apic_aim_auth/auth_url':   value => "$k_auth_url/v3";
-       'apic_aim_auth/username':   value => $apic_username;
-       'apic_aim_auth/password':   value => $apic_password;
+       'apic_aim_auth/username':   value => hiera('CONFIG_KEYSTONE_ADMIN_USERNAME');
+       'apic_aim_auth/password':   value => hiera('CONFIG_KEYSTONE_ADMIN_PW');
        'apic_aim_auth/user_domain_name':  value => 'default';
        'apic_aim_auth/project_domain_name': value => 'default';
        'apic_aim_auth/project_name': value => 'admin';
-       'apic_vmdom:ostack/encap_mode': value => 'vxlan';
        'group_policy/policy_drivers': value => 'aim_mapping';
        'group_policy/extension_drivers': value => 'aim_extension,proxy_group';
      }
@@ -106,8 +87,12 @@ class gbp::gbp_neutron_conf(
    $swarr = parsejson(hiera('CONFIG_APIC_CONN_JSON'))
 
    if ($use_lldp == "True") {
+      #
    } else {
-       add_switch_conn_to_neutron_conf{'xyz': sa => $swarr}
+      if $enable_aim == "True" {
+      } else {
+         add_switch_conn_to_neutron_conf{'xyz': sa => $swarr}
+      }
    }
 
    $extnet_arr = parsejson(hiera('CONFIG_APIC_EXTNET_JSON'))
@@ -128,5 +113,8 @@ class gbp::gbp_neutron_conf(
      }
    }
 
-   add_extnet_to_neutron_conf{'abc': na => $extnet_arr}
+   if $enable_aim == "True" {
+   } else {
+     add_extnet_to_neutron_conf{'abc': na => $extnet_arr}
+   }
 }

@@ -8,7 +8,7 @@ class gbp::gbp_neutron_ml2 (
      'ovs/local_ip': value => hiera('CONFIG_CONTROLLER_HOST');
    }
 
-   if $enable_aim {
+   if $enable_aim == "True" {
       neutron_plugin_ml2 {
          'ml2/mechanism_drivers': value => "apic_aim";
          'ml2/extension_drivers': value => "apic_aim";

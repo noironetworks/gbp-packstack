@@ -1,7 +1,7 @@
 class gbp::aim(
     $enable_aim = hiera('CONFIG_ENABLE_AIM')
 ) {
-   if $enable_aim {
+   if $enable_aim == "True" {
       package {'aci-integration-module':
          ensure => installed,
          provider => yum,
