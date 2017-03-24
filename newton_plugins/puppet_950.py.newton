@@ -208,14 +208,17 @@ def apply_puppet_manifest(config, messages):
     if logging.root.level <= logging.DEBUG:
         loglevel = '--debug'
         logcmd = True
+    #starting newton, all manifests are clubbed into one for each role which is done in this plugin.
+    #gbp plugin comes before this, so next call returns a list which has gbp manifests before the base manifests
+    #so remove the gbp manifests from the beginning of the list and add them to the end while maintaining the sequence
+    #of base manifest files
     olist = manifestfiles.getFiles()
-    mlist = alist = []
-    for el in olist:
-        fi, m = el
-        if re.search('gbp', fi):
-           mlist.append(el)
-           alist.append(el)
-    nlist = list(set(olist) - set(mlist)) + alist
+    idxl = [(i,word[0]) for i, word in enumerate(olist) if word[0].endswith('gbp.pp')]
+    ddxl = []
+    for el in idxl[::-1]:
+       ddxl = [olist[el[0]]] + ddxl
+       del olist[el[0]]
+    nlist = olist + ddxl
     for manifest, marker in nlist:
         # if the marker has changed then we don't want to proceed until
         # all of the previous puppet runs have finished
