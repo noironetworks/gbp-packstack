@@ -34,7 +34,7 @@ class gbp::gbp_neutron_conf(
        'apic_aim_auth/project_domain_name': value => 'default';
        'apic_aim_auth/project_name': value => 'admin';
        'group_policy/policy_drivers': value => 'aim_mapping';
-       'group_policy/extension_drivers': value => 'aim_extension,proxy_group';
+       'group_policy/extension_drivers': value => 'aim_extension,proxy_group,apic_allowed_vm_name,apic_segmentation_label';
      }
    } else {
      neutron_config {

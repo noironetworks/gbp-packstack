@@ -11,7 +11,7 @@ class gbp::gbp_neutron_ml2 (
    if $enable_aim == "True" {
       neutron_plugin_ml2 {
          'ml2/mechanism_drivers': value => "apic_aim";
-         'ml2/extension_drivers': value => "apic_aim";
+         'ml2/extension_drivers': value => "apic_aim,port_security";
       }
    } else {
       neutron_plugin_ml2 {
