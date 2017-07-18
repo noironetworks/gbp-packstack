@@ -25,7 +25,7 @@ class gbp::gbp_neutron_conf(
    if $enable_aim == "True" {
      neutron_config {
        'DEFAULT/core_plugin':   value => 'ml2plus';
-       'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_aim_l3';
+       'DEFAULT/service_plugins': value => 'group_policy,ncp,apic_aim_l3';
        'apic_aim_auth/auth_plugin': value => 'v3password';
        'apic_aim_auth/auth_url':   value => "$k_auth_url/v3";
        'apic_aim_auth/username':   value => hiera('CONFIG_KEYSTONE_ADMIN_USERNAME');
@@ -35,11 +35,13 @@ class gbp::gbp_neutron_conf(
        'apic_aim_auth/project_name': value => 'admin';
        'group_policy/policy_drivers': value => 'aim_mapping';
        'group_policy/extension_drivers': value => 'aim_extension,proxy_group,apic_allowed_vm_name,apic_segmentation_label';
+       'node_composition_plugin/node_drivers': value => 'node_dummy';
+       'node_composition_plugin/node_plumber': value => 'dummy_plumber';
      }
    } else {
      neutron_config {
        'DEFAULT/core_plugin':   value => 'ml2';
-       'DEFAULT/service_plugins': value => 'group_policy,servicechain,apic_gbp_l3';
+       'DEFAULT/service_plugins': value => 'group_policy,ncp,apic_gbp_l3';
        'ml2_cisco_apic/vni_ranges': value => '11000:11100';
        'ml2_cisco_apic/apic_hosts': value => $apic_controller;
        'ml2_cisco_apic/apic_username': value => $apic_username;
@@ -59,6 +61,8 @@ class gbp::gbp_neutron_conf(
        'ml2_cisco_apic/apic_vpc_pairs': value => $apic_vpc_pairs;
        'group_policy/policy_drivers': value => 'implicit_policy,apic';
        'group_policy_implicit_policy/default_ip_pool': value => '192.168.0.0/16';
+       'node_composition_plugin/node_drivers': value => 'node_dummy';
+       'node_composition_plugin/node_plumber': value => 'dummy_plumber';
      }
    }
 
